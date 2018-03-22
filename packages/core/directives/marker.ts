@@ -41,7 +41,7 @@ let markerId = 0;
     'latitude', 'longitude', 'title', 'label', 'draggable: markerDraggable', 'iconUrl',
     'openInfoWindow', 'opacity', 'visible', 'zIndex', 'animation'
   ],
-  outputs: ['markerClick', 'dragEnd', 'mouseOver', 'mouseOut']
+  outputs: ['markerClick', 'dragEnd', 'mouseOver', 'mouseOut', 'contextmenu']
 })
 export class AgmMarker implements OnDestroy, OnChanges, AfterContentInit {
   /**
@@ -129,6 +129,11 @@ export class AgmMarker implements OnDestroy, OnChanges, AfterContentInit {
    * This event is fired when the user mouses outside the marker.
    */
   @Output() mouseOut: EventEmitter<MouseEvent> = new EventEmitter<MouseEvent>();
+                                      
+  /**
+   * This event is fired when the user mouses outside the marker.
+   */
+  @Output() contextmenu: EventEmitter<MouseEvent> = new EventEmitter<MouseEvent>();
 
   /**
    * @internal
@@ -228,6 +233,13 @@ export class AgmMarker implements OnDestroy, OnChanges, AfterContentInit {
               this.mouseOut.emit(<MouseEvent>{coords: {lat: e.latLng.lat(), lng: e.latLng.lng()}});
             });
     this._observableSubscriptions.push(mout);
+                                      
+     const contextmenu =
+        this._markerManager.createEventObservable<mapTypes.MouseEvent>('contextmenu', this)
+            .subscribe((e) => {
+              this.contextmenu.emit(e);
+            });
+    this._observableSubscriptions.push(contextmenu);
   }
 
   /** @internal */
